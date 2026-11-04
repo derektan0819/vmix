@@ -1,0 +1,2041 @@
+/* ==========================================================================
+   Mobile Bartender — style.css
+   Mobile-first. All colours, type, spacing and radii live in :root below:
+   change a value there and it updates across the whole site.
+   ========================================================================== */
+
+/* ---------- 1. Design tokens ---------- */
+/* Layout: a speakeasy menu card. Arch-topped "back-bar niches" frame every
+   cocktail photo; everything else stays square, flat and quiet. */
+:root {
+  color-scheme: dark; /* deliberately dark-only: native pickers & scrollbars follow */
+
+  /* Colours: backgrounds (warm inks, biased toward the gold) */
+  --color-bg: #0f0d0b;            /* page background */
+  --color-bg-alt: #15120f;        /* alternate section band */
+  --color-surface: #1c1814;       /* panels, form, inputs' surroundings */
+  --color-footer: #0a0908;
+
+  /* Colours: accents (champagne / bronze, never pure yellow) */
+  --color-gold: #cfae74;          /* main accent */
+  --color-gold-light: #e4cb9c;    /* hover / highlights */
+  --color-gold-deep: #9a774a;     /* bronze, small decorative details */
+  --color-on-gold: #17130e;       /* text on gold buttons */
+  --color-bordeaux: rgba(122, 38, 46, 0.32); /* used only as a faint glow */
+
+  /* Colours: text */
+  --color-text: #f3ede2;          /* headings & body (warm ivory) */
+  --color-text-muted: #bfb6a6;    /* secondary text */
+  --color-text-subtle: #9b9283;   /* hints, fine print */
+
+  /* Colours: lines, states */
+  --color-border: rgba(207, 174, 116, 0.16);
+  --color-border-strong: rgba(207, 174, 116, 0.42);
+  --color-focus: #e4cb9c;
+  --color-error: #f0a597;
+  --color-success: #b9d6a9;
+
+  /* Colours: placeholder markers (so unfinished content is obvious) */
+  --color-tbd: #e8a77c;
+  --color-tbd-bg: rgba(232, 167, 124, 0.12);
+
+  /* Colours: photo-placeholder glows, cycled across cards */
+  --tint-0: rgba(207, 174, 116, 0.30);  /* amber */
+  --tint-1: rgba(164, 54, 64, 0.38);    /* ruby */
+  --tint-2: rgba(72, 124, 98, 0.34);    /* emerald */
+  --tint-3: rgba(118, 84, 140, 0.34);   /* plum */
+  --tint-4: rgba(214, 146, 78, 0.32);   /* citrus */
+  --tint-5: rgba(88, 128, 162, 0.32);   /* ice */
+
+  /* Typography (system fonts only, no downloads)
+     display: high-contrast Didone for headlines and drink names
+     label:   1920s geometric sans for buttons, labels, small caps
+     body:    the device's own UI face for reading */
+  --font-display: "Bodoni 72", Didot, "Bodoni MT", "Iowan Old Style", "Palatino Linotype", Georgia, "Noto Serif", serif;
+  --font-label: Futura, "Futura PT", "Century Gothic", "Avenir Next", Avenir, "Trebuchet MS", sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+
+  --text-2xs: 0.6875rem;
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: clamp(1.375rem, 1.2rem + 0.8vw, 1.75rem);
+  --text-2xl: clamp(2.125rem, 1.6rem + 2.4vw, 3.25rem);
+  --text-hero: clamp(2.5rem, 1.6rem + 4vw, 4.5rem);
+
+  --tracking-label: 0.18em;  /* letter-spacing for uppercase labels */
+
+  /* Spacing */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: clamp(4rem, 3rem + 4vw, 7rem);  /* section padding */
+
+  /* Layout */
+  --gutter: 1rem;          /* page side padding (16px on phones) */
+  --container: 72rem;      /* max content width */
+  --header-h: 4rem;        /* fixed top bar height */
+  --tap: 48px;             /* minimum touch target */
+
+  /* Radii: square everywhere, except the arch (the one bold shape) */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-btn: 2px;
+  --radius-arch: 999px 999px var(--radius-md) var(--radius-md);
+
+  /* Motion */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur: 220ms;
+  --dur-reveal: 700ms;
+}
+
+@media (min-width: 48em) {
+  :root {
+    --gutter: 2rem;
+    --header-h: 4.5rem;
+  }
+}
+
+/* ---------- 2. Base ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html.has-dialog {
+  overflow: hidden; /* no page scroll behind the lightbox */
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip; /* safety net against horizontal scroll */
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+p,
+blockquote,
+figure {
+  margin: 0;
+}
+
+a {
+  color: var(--color-gold);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* Clear, consistent keyboard focus */
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* Anchored sections stop below the fixed header */
+[id] {
+  scroll-margin-top: var(--header-h);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--space-md);
+  top: -100px;
+  z-index: 100;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: var(--space-md);
+}
+
+.container {
+  width: 100%;
+  max-width: calc(var(--container) + var(--gutter) * 2);
+  margin-inline: auto;
+  padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
+}
+
+/* Small uppercase label style, shared */
+.label {
+  font-family: var(--font-label);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+/* ---------- 3. Placeholder markers ---------- */
+/* Any "[ ... ]" text from SITE_CONFIG is wrapped in .tbd so it can't be missed */
+.tbd {
+  color: var(--color-tbd);
+  background: var(--color-tbd-bg);
+  border-bottom: 1px dashed currentColor;
+  border-radius: var(--radius-sm);
+  padding: 0 0.15em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Floating counter (bottom-left), only shown while placeholders remain */
+.tbd-badge {
+  position: fixed;
+  left: max(12px, env(safe-area-inset-left, 0px));
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  z-index: 60;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2xs);
+  max-width: min(26rem, calc(100% - 96px));
+  padding: 0 0 0 0.85rem;
+  border: 1px dashed var(--color-tbd);
+  border-radius: var(--radius-md);
+  background: #241911;
+  color: var(--color-tbd);
+  font-size: var(--text-xs);
+  line-height: 1.3;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.tbd-badge details {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.tbd-badge summary {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  cursor: pointer;
+}
+
+.tbd-badge ol {
+  max-height: 45vh;
+  margin: 0 0 var(--space-sm);
+  padding: 0 0 0 1.25rem;
+  overflow: auto;
+  color: var(--color-text-muted);
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: var(--text-2xs);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.tbd-badge__close {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* ---------- 4. Buttons & chips ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  min-height: var(--tap);
+  padding: 0 1.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-btn);
+  font-family: var(--font-label);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  line-height: 1.2;
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+
+.btn--primary {
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+}
+
+.btn--ghost,
+.btn--outline {
+  border-color: var(--color-border-strong);
+  background: transparent;
+  color: var(--color-gold);
+}
+
+.btn--ghost {
+  color: var(--color-text);
+}
+
+/* Toggled state (e.g. "Added" on an extra) */
+.btn--outline[aria-pressed="true"] {
+  border-color: var(--color-gold);
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+}
+
+.btn--sm {
+  min-height: 44px;
+  padding: 0 1rem;
+  letter-spacing: 0.14em;
+}
+
+.btn--lg {
+  min-height: 56px;
+  padding: 0 2rem;
+}
+
+.btn--block {
+  width: 100%;
+}
+
+@media (hover: hover) {
+  .btn--primary:hover {
+    background: var(--color-gold-light);
+  }
+
+  .btn--ghost:hover,
+  .btn--outline:not([aria-pressed="true"]):hover {
+    border-color: var(--color-gold);
+    color: var(--color-gold-light);
+  }
+}
+
+/* Small square tags: quick event links, menu filters */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 1rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-btn);
+  background: transparent;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color var(--dur) var(--ease), background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+@media (hover: hover) {
+  .chip:hover {
+    border-color: var(--color-gold);
+    color: var(--color-gold-light);
+  }
+}
+
+.chip[aria-pressed="true"] {
+  border-color: var(--color-gold);
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+}
+
+/* ---------- 5. Header & navigation ---------- */
+.site-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  height: var(--header-h);
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+
+/* Solid bar once the page scrolls or the menu opens */
+.site-header.is-scrolled,
+.site-header.is-open {
+  background: rgba(15, 13, 11, 0.92);
+  border-bottom-color: var(--color-border);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  height: 100%;
+}
+
+.brand {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  line-height: 44px; /* full-height tap target */
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex: none;
+}
+
+/* Hamburger (phones only) */
+.nav__toggle {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: var(--tap);
+  height: var(--tap);
+  margin-right: -10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.nav__toggle-bar {
+  display: block;
+  width: 22px;
+  height: 1.5px;
+  background: var(--color-text);
+  transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
+}
+
+.site-header.is-open .nav__toggle-bar:nth-child(1) {
+  transform: translateY(6.5px) rotate(45deg);
+}
+
+.site-header.is-open .nav__toggle-bar:nth-child(2) {
+  opacity: 0;
+}
+
+.site-header.is-open .nav__toggle-bar:nth-child(3) {
+  transform: translateY(-6.5px) rotate(-45deg);
+}
+
+/* Mobile dropdown menu */
+.nav__menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: calc(100vh - var(--header-h));
+  margin: 0;
+  padding: var(--space-xs) max(var(--gutter), env(safe-area-inset-right, 0px)) var(--space-lg) max(var(--gutter), env(safe-area-inset-left, 0px));
+  overflow-y: auto;
+  list-style: none;
+  background: rgba(15, 13, 11, 0.97);
+  border-bottom: 1px solid var(--color-border);
+  visibility: hidden; /* also removes links from the tab order while closed */
+  opacity: 0;
+  transform: translateY(-8px);
+  transition:
+    opacity var(--dur) var(--ease),
+    transform var(--dur) var(--ease),
+    visibility var(--dur);
+}
+
+.site-header.is-open .nav__menu {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+}
+
+.nav__link {
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  text-decoration: none;
+}
+
+.nav__menu li:last-child .nav__link {
+  border-bottom: 0;
+}
+
+/* Desktop: inline links, no hamburger */
+@media (min-width: 56em) {
+  .nav__toggle {
+    display: none;
+  }
+
+  .brand {
+    flex: 0 1 auto;
+    font-size: 1.375rem;
+  }
+
+  .nav {
+    margin-left: auto;
+  }
+
+  .nav__menu {
+    position: static;
+    display: flex;
+    gap: var(--space-lg);
+    max-height: none;
+    padding: 0;
+    overflow: visible;
+    background: none;
+    border: 0;
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+  }
+
+  .nav__link {
+    min-height: var(--tap);
+    border: 0;
+    color: var(--color-text-muted);
+    font-family: var(--font-label);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    transition: color var(--dur) var(--ease);
+  }
+
+  .nav__link:hover {
+    color: var(--color-gold-light);
+  }
+
+  .site-header__actions {
+    margin-left: var(--space-lg);
+  }
+}
+
+/* ---------- 6. Shared section styles ---------- */
+.section {
+  padding-block: var(--space-3xl);
+}
+
+/* Applied by script.js to every second visible section */
+.section--alt {
+  background: var(--color-bg-alt);
+  border-block: 1px solid var(--color-border);
+}
+
+.section__head {
+  display: grid;
+  gap: var(--space-md);
+  max-width: 38rem;
+  margin-bottom: var(--space-2xl);
+}
+
+.section__more {
+  margin-top: var(--space-xl);
+  text-align: center;
+}
+
+.section__more:empty {
+  display: none;
+}
+
+.eyebrow {
+  color: var(--color-gold);
+}
+
+.section__title {
+  font-size: var(--text-2xl);
+}
+
+.section__intro {
+  color: var(--color-text-muted);
+  font-size: var(--text-lg);
+}
+
+.section__note {
+  color: var(--color-text-subtle);
+  font-size: var(--text-sm);
+}
+
+/* Shared size for line icons */
+.icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  color: var(--color-gold);
+}
+
+/* ---------- 7. Photo placeholders (pure CSS, no image files) ---------- */
+.ph {
+  --ph-glow: var(--tint-0);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  width: 100%;
+  height: 100%;
+  padding: var(--space-md);
+  border-radius: inherit;
+  color: rgba(228, 203, 156, 0.82);
+  text-align: center;
+  background:
+    radial-gradient(120% 75% at 70% 15%, var(--ph-glow), transparent 62%),
+    radial-gradient(90% 60% at 15% 95%, rgba(207, 174, 116, 0.10), transparent 60%),
+    linear-gradient(165deg, #201b16 0%, #110f0d 100%);
+}
+
+/* Dashed frame = "this is a placeholder" (follows the arch shape) */
+.ph::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px dashed rgba(228, 203, 156, 0.35);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.ph__icon {
+  width: 36px;
+  height: 36px;
+  opacity: 0.85;
+}
+
+.ph__label {
+  font-family: var(--font-label);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  line-height: 1.45;
+  text-transform: uppercase;
+}
+
+.ph__label small {
+  display: block;
+  margin-top: 0.2rem;
+  font-family: var(--font-body);
+  font-size: var(--text-2xs);
+  letter-spacing: 0.02em;
+  text-transform: none;
+  opacity: 0.85;
+}
+
+.ph--tint-0 { --ph-glow: var(--tint-0); }
+.ph--tint-1 { --ph-glow: var(--tint-1); }
+.ph--tint-2 { --ph-glow: var(--tint-2); }
+.ph--tint-3 { --ph-glow: var(--tint-3); }
+.ph--tint-4 { --ph-glow: var(--tint-4); }
+.ph--tint-5 { --ph-glow: var(--tint-5); }
+
+/* ---------- 8. Hero ---------- */
+/* Sized to its content: text + one arch-framed portrait */
+.hero {
+  padding-block: calc(var(--header-h) + var(--space-lg)) var(--space-2xl);
+  background:
+    radial-gradient(50% 45% at 50% 22%, rgba(207, 174, 116, 0.09), transparent 70%),
+    radial-gradient(40% 40% at 80% 80%, var(--color-bordeaux), transparent 70%),
+    var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.hero__grid {
+  display: grid;
+  gap: var(--space-xl);
+  align-items: center;
+}
+
+.hero__media {
+  order: -1; /* phones: photo first */
+  position: relative;
+  justify-self: center;
+  width: min(100% - 20px, 17.5rem);
+  margin-top: 10px;
+}
+
+/* Thin gold arch drawn around the photo */
+.hero__media::before {
+  content: "";
+  position: absolute;
+  inset: -10px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-arch);
+  pointer-events: none;
+}
+
+.hero__arch {
+  aspect-ratio: 4 / 5;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-arch);
+  background: var(--color-surface);
+}
+
+.hero__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero__content {
+  display: grid;
+  justify-items: start;
+  min-width: 0;
+}
+
+.hero__eyebrow {
+  margin-bottom: var(--space-md);
+  color: var(--color-gold);
+}
+
+.hero__title {
+  font-size: var(--text-hero);
+  line-height: 1.02;
+  letter-spacing: -0.005em;
+}
+
+.hero__lead {
+  max-width: 34rem;
+  margin-top: var(--space-lg);
+  color: var(--color-text-muted);
+  font-size: var(--text-lg);
+}
+
+.hero__actions {
+  display: grid;
+  gap: var(--space-sm);
+  width: 100%;
+  margin-top: var(--space-xl);
+}
+
+/* Credentials line (from SITE_CONFIG.highlights) */
+.hero__creds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-lg);
+  width: 100%;
+  margin: var(--space-xl) 0 0;
+  padding: var(--space-lg) 0 0;
+  border-top: 1px solid var(--color-border);
+  list-style: none;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.hero__cred-value {
+  color: var(--color-gold);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+}
+
+/* "Planning a…" quick links that pre-select the event type */
+.quick-events {
+  width: 100%;
+  margin-top: var(--space-lg);
+}
+
+.quick-events__label {
+  margin-bottom: var(--space-sm);
+  color: var(--color-text-subtle);
+}
+
+.quick-events__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 30em) {
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    width: auto;
+  }
+}
+
+@media (min-width: 56em) {
+  .hero {
+    padding-block: calc(var(--header-h) + var(--space-2xl)) var(--space-3xl);
+    background:
+      radial-gradient(35% 55% at 78% 45%, rgba(207, 174, 116, 0.10), transparent 70%),
+      radial-gradient(30% 40% at 90% 90%, var(--color-bordeaux), transparent 70%),
+      var(--color-bg);
+  }
+
+  .hero__grid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: var(--space-3xl);
+  }
+
+  .hero__media {
+    order: 0;
+    width: min(100% - 20px, 25rem);
+  }
+
+  .ph__label {
+    font-size: var(--text-xs);
+  }
+}
+
+/* ---------- 9. Services (packages) ---------- */
+.services {
+  display: grid;
+  gap: var(--space-md);
+}
+
+@media (min-width: 56em) {
+  .services {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-lg);
+  }
+}
+
+.service {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-xl) var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  transition: border-color var(--dur) var(--ease);
+}
+
+@media (hover: hover) {
+  .service:hover {
+    border-color: var(--color-border-strong);
+  }
+}
+
+.service__name {
+  font-size: var(--text-xl);
+}
+
+.service__price {
+  color: var(--color-gold);
+  font-family: var(--font-display);
+  font-size: 1.625rem;
+  line-height: 1.2;
+}
+
+.service__summary {
+  color: var(--color-text-muted);
+}
+
+/* Dash list (package details) */
+.dash-list {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0 0 var(--space-md);
+  padding: var(--space-md) 0 0;
+  list-style: none;
+  border-top: 1px solid var(--color-border);
+}
+
+.dash-list li {
+  display: flex;
+  gap: var(--space-sm);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.dash-list li::before {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 1px;
+  margin-top: 0.8em;
+  background: var(--color-gold);
+}
+
+.service .btn {
+  margin-top: auto;
+}
+
+/* Travel & coverage: a small rate card under the packages */
+.coverage {
+  display: grid;
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+@media (min-width: 56em) {
+  .coverage {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-2xl);
+    align-items: center;
+    margin-top: var(--space-xl);
+    padding: var(--space-xl);
+  }
+}
+
+.coverage__head {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+  gap: var(--space-md);
+  align-items: start;
+}
+
+.coverage__title {
+  font-size: 1.25rem;
+}
+
+.coverage__intro {
+  margin-top: 0.3rem;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.coverage__zones {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.coverage__zone {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.coverage__area {
+  min-width: 0;
+}
+
+.coverage__leader {
+  flex: 1 1 1rem;
+  min-width: 1rem;
+  border-bottom: 1px dotted var(--color-border-strong);
+  transform: translateY(-0.3em);
+}
+
+.coverage__fee {
+  flex: none;
+  color: var(--color-gold);
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  white-space: nowrap;
+}
+
+/* ---------- 10. Extras (menu-style list, not cards) ---------- */
+.extras {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--color-border);
+}
+
+.extra {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-md);
+  padding-block: var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.extra__body {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.extra__name {
+  font-size: 1.25rem;
+}
+
+.extra__desc {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.extra__price {
+  color: var(--color-gold);
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+}
+
+.extra__toggle {
+  min-width: 6.5rem; /* "Add" and "Added" keep the same width */
+}
+
+@media (min-width: 56em) {
+  .extras {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-2xl);
+    border-top: 0;
+  }
+
+  .extra:nth-child(-n + 2) {
+    border-top: 1px solid var(--color-border);
+  }
+}
+
+/* ---------- 11. Cocktail menu ---------- */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-xl);
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-xl) var(--space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 56em) {
+  .menu-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2xl) var(--space-xl);
+  }
+}
+
+.drink {
+  min-width: 0;
+}
+
+/* The arch: a back-bar niche for each drink */
+.drink__media {
+  aspect-ratio: 4 / 5;
+  max-width: 100%;
+  margin-bottom: var(--space-md);
+  overflow: hidden;
+  border-radius: var(--radius-arch);
+  background: var(--color-surface);
+}
+
+.drink__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 600ms var(--ease);
+}
+
+@media (hover: hover) {
+  .drink:hover .drink__img {
+    transform: scale(1.03);
+  }
+}
+
+.drink__tag {
+  margin-bottom: 0.35rem;
+  color: var(--color-gold);
+  font-size: var(--text-2xs);
+}
+
+/* Name …… base spirit, like a printed bar menu (leader dots on wide screens) */
+.drink__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.5rem;
+}
+
+.drink__name {
+  min-width: 0;
+  font-size: 1.25rem;
+}
+
+.drink__leader {
+  display: none;
+}
+
+.drink__base {
+  flex-basis: 100%;
+  color: var(--color-text-subtle);
+  font-size: var(--text-2xs);
+}
+
+.drink__desc {
+  margin-top: 0.4rem;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+@media (min-width: 56em) {
+  .drink__name {
+    font-size: 1.5rem;
+  }
+
+  .drink__leader {
+    display: block;
+    flex: 1 1 1.5rem;
+    border-bottom: 1px dotted var(--color-border-strong);
+    transform: translateY(-0.3em);
+  }
+
+  .drink__base {
+    flex-basis: auto;
+  }
+}
+
+/* ---------- 12. Gallery & lightbox ---------- */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 48em) {
+  .gallery {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-sm);
+  }
+}
+
+.gallery__item {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+/* Real photos are buttons that open the lightbox */
+.gallery__open {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.gallery__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 600ms var(--ease);
+}
+
+@media (hover: hover) {
+  .gallery__open:hover .gallery__img {
+    transform: scale(1.04);
+  }
+}
+
+.gallery__caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: var(--space-lg) var(--space-sm) var(--space-sm);
+  background: linear-gradient(transparent, rgba(10, 9, 8, 0.85));
+  color: var(--color-text);
+  font-size: var(--text-xs);
+  text-align: left;
+  pointer-events: none;
+}
+
+.lightbox {
+  width: min(100% - 2rem, 70rem);
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  overflow: visible;
+}
+
+/* Literal colour: some browsers don't pass CSS variables into ::backdrop */
+.lightbox::backdrop {
+  background: rgba(6, 5, 4, 0.92);
+}
+
+.lightbox__inner {
+  position: relative;
+}
+
+.lightbox__img {
+  width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+}
+
+.lightbox__caption {
+  margin-top: var(--space-sm);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.lightbox__btn {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 50%;
+  background: rgba(15, 13, 11, 0.75);
+  color: var(--color-text);
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.lightbox__close {
+  top: -56px;
+  right: 0;
+}
+
+.lightbox__prev,
+.lightbox__next {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.lightbox__prev {
+  left: 8px;
+}
+
+.lightbox__next {
+  right: 8px;
+}
+
+/* ---------- 13. How it works (a real sequence, so it is numbered) ---------- */
+.process {
+  display: grid;
+  gap: var(--space-xl);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+@media (min-width: 48em) {
+  .process {
+    grid-auto-flow: column;            /* one equal column per step */
+    grid-auto-columns: minmax(0, 1fr);
+    gap: var(--space-2xl);
+  }
+}
+
+.step {
+  position: relative;
+  padding-left: 3.5rem;
+  counter-increment: step;
+}
+
+.step::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: -0.35rem;
+  color: var(--color-gold);
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+@media (min-width: 48em) {
+  .step {
+    padding: 3.75rem 0 0;
+    border-top: 1px solid var(--color-border-strong);
+  }
+
+  .step::before {
+    top: 1rem;
+  }
+}
+
+.step__title {
+  font-size: 1.375rem;
+}
+
+.step__text {
+  margin-top: var(--space-xs);
+  color: var(--color-text-muted);
+}
+
+/* ---------- 14. Testimonials (typographic, no cards) ---------- */
+.reviews {
+  display: grid;
+  gap: var(--space-2xl);
+}
+
+@media (min-width: 56em) {
+  .reviews {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.review {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  min-width: 0;
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border-strong);
+}
+
+.review__quote {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.review__quote::before {
+  content: "\201C";
+  display: block;
+  height: 2rem;
+  color: var(--color-gold);
+  font-size: 3.5rem;
+  font-style: normal;
+  line-height: 1;
+}
+
+.review__by {
+  margin-top: auto;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.review__name {
+  display: block;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* ---------- 15. FAQ ---------- */
+.faq-wrap {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+@media (min-width: 60em) {
+  .faq-wrap {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--space-2xl);
+    align-items: start;
+  }
+
+  .faq-wrap .section__head {
+    margin-bottom: 0;
+  }
+}
+
+.faq {
+  border-top: 1px solid var(--color-border);
+}
+
+.faq__item {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.faq__q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  min-height: 64px;
+  padding: var(--space-md) 0;
+  font-family: var(--font-display);
+  font-size: 1.1875rem;
+  line-height: 1.3;
+  list-style: none;
+  cursor: pointer;
+}
+
+.faq__q::-webkit-details-marker {
+  display: none;
+}
+
+/* Plus sign that turns into a minus */
+.faq__q::after {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background:
+    linear-gradient(var(--color-gold), var(--color-gold)) center / 14px 1.5px no-repeat,
+    linear-gradient(var(--color-gold), var(--color-gold)) center / 1.5px 14px no-repeat;
+  transition: transform var(--dur) var(--ease);
+}
+
+.faq__item[open] .faq__q::after {
+  transform: rotate(90deg);
+  background: linear-gradient(var(--color-gold), var(--color-gold)) center / 14px 1.5px no-repeat;
+}
+
+.faq__a {
+  max-width: 65ch;
+  padding: 0 0 var(--space-lg);
+  color: var(--color-text-muted);
+}
+
+.faq__more {
+  margin-top: var(--space-lg);
+  color: var(--color-text-muted);
+}
+
+.faq__more:empty {
+  display: none;
+}
+
+/* ---------- 16. Booking form ---------- */
+.booking {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+.booking__head {
+  margin-bottom: 0;
+}
+
+@media (min-width: 60em) {
+  .booking {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--space-2xl);
+    align-items: start;
+  }
+
+  .booking__head {
+    position: sticky;
+    top: calc(var(--header-h) + var(--space-xl));
+  }
+}
+
+.booking__panel {
+  display: grid;
+  gap: var(--space-lg);
+  min-width: 0;
+}
+
+/* The one framed object on the page: a double gold rule, like a menu card */
+.form {
+  display: grid;
+  gap: var(--space-xl);
+  padding: var(--space-xl) var(--space-lg);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  outline: 1px solid var(--color-border);
+  outline-offset: -8px;
+  background: var(--color-surface);
+}
+
+@media (min-width: 40em) {
+  .form {
+    padding: var(--space-2xl) var(--space-xl);
+  }
+}
+
+fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.form__group + .form__group {
+  padding-top: var(--space-xl);
+  border-top: 1px solid var(--color-border);
+}
+
+.form__legend {
+  float: left; /* lets the legend sit inside the normal layout */
+  width: 100%;
+  margin-bottom: var(--space-lg);
+  padding: 0;
+  color: var(--color-gold);
+}
+
+.form__fields {
+  clear: both;
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.form__note,
+.form__fineprint {
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+}
+
+.form__fineprint {
+  margin-top: calc(var(--space-md) * -1);
+  text-align: center;
+}
+
+.form__row {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+@media (min-width: 30em) {
+  .form__row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+  align-content: start;
+  min-width: 0;
+}
+
+.field__label {
+  padding: 0;
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+legend.field__label {
+  float: left;
+  width: 100%;
+  margin-bottom: 0.4rem;
+}
+
+.field__optional {
+  color: var(--color-text-subtle);
+  font-weight: 400;
+}
+
+.field__hint {
+  margin-top: -0.2rem;
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+}
+
+.input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 52px;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 1rem; /* 16px+ stops iOS zooming into fields */
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  scroll-margin-top: calc(var(--header-h) + var(--space-2xl));
+}
+
+.input::placeholder {
+  color: var(--color-text-subtle);
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .input:hover {
+    border-color: rgba(207, 174, 116, 0.6);
+  }
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+  border-color: var(--color-gold);
+}
+
+/* iOS date/time input alignment */
+.input::-webkit-date-and-time-value {
+  text-align: left;
+}
+
+textarea.input {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* Custom chevron for selects (SVG colour = --color-gold, hard-coded in the URL) */
+select.input {
+  padding-right: 2.75rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23cfae74' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-position: right 1rem center;
+  background-repeat: no-repeat;
+  background-size: 12px 8px;
+  cursor: pointer;
+}
+
+select.input option {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+/* Checkboxes (extras) */
+.checks {
+  clear: both;
+  display: grid;
+  gap: var(--space-xs);
+}
+
+@media (min-width: 30em) {
+  .checks {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: 0;
+  min-height: var(--tap);
+  padding: 0.5rem 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease);
+}
+
+.check:has(input:checked) {
+  border-color: var(--color-gold);
+}
+
+.check input {
+  flex: none;
+  display: grid;
+  place-content: center;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.check input::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  background: var(--color-on-gold);
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+  transform: scale(0);
+  transition: transform 120ms var(--ease);
+}
+
+.check input:checked {
+  border-color: var(--color-gold);
+  background: var(--color-gold);
+}
+
+.check input:checked::before {
+  transform: scale(1);
+}
+
+/* Error state */
+.field--invalid .input {
+  border-color: var(--color-error);
+}
+
+.field__error {
+  color: var(--color-error);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+.field__error:empty {
+  display: none;
+}
+
+/* Booking terms + "I agree" tick, just above the Send button */
+.terms {
+  display: grid;
+  gap: var(--space-md);
+  padding-top: var(--space-xl);
+  border-top: 1px solid var(--color-border);
+}
+
+.terms__title {
+  color: var(--color-gold);
+}
+
+.terms__list {
+  margin: 0;
+  padding: 0;
+  border-top: 0;
+}
+
+.check--agree {
+  min-height: 56px;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.field--invalid .check {
+  border-color: var(--color-error);
+}
+
+/* Brief glow when a shortcut pre-fills a field */
+.input.is-prefilled {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(207, 174, 116, 0.22);
+}
+
+/* ---------- 17. Result panel (after submit) ---------- */
+.result {
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: rgba(207, 174, 116, 0.06);
+}
+
+@media (min-width: 40em) {
+  .result {
+    padding: var(--space-xl);
+  }
+}
+
+.result:focus {
+  outline: none;
+}
+
+.result__title {
+  color: var(--color-gold-light);
+  font-size: var(--text-xl);
+}
+
+.result__text {
+  color: var(--color-text-muted);
+}
+
+.result__message {
+  min-height: 260px;
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.result__actions {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+@media (min-width: 30em) {
+  .result__actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.result__status {
+  min-height: 1.5em;
+  color: var(--color-success);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+/* ---------- 18. Footer ---------- */
+.site-footer {
+  padding-block: var(--space-2xl) calc(var(--space-xl) + 64px + env(safe-area-inset-bottom, 0px)); /* room for floating buttons */
+  border-top: 1px solid var(--color-border);
+  background: var(--color-footer);
+}
+
+.footer__grid {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+@media (min-width: 48em) {
+  .footer__grid {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+}
+
+.footer__brand {
+  font-family: var(--font-display);
+  font-size: 1.625rem;
+  line-height: 1.2;
+}
+
+.footer__area {
+  margin-top: var(--space-xs);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.footer__heading {
+  margin-bottom: var(--space-xs);
+  color: var(--color-gold);
+  font-family: var(--font-label);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.footer__list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.footer__item {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+a.footer__item:hover {
+  color: var(--color-gold-light);
+}
+
+/* Alcohol notice, like the fine print on a bottle label */
+.footer__legal {
+  margin-top: var(--space-xl);
+  color: var(--color-text-subtle);
+  font-size: var(--text-2xs);
+}
+
+.footer__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs) var(--space-lg);
+  margin-top: var(--space-xl);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+}
+
+.footer__top {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.footer__top:hover {
+  color: var(--color-gold-light);
+}
+
+.noscript {
+  padding: var(--space-xl) var(--gutter);
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+/* ---------- 19. Floating WhatsApp button ---------- */
+.wa-float {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 55;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+  transition: background-color var(--dur) var(--ease);
+}
+
+.wa-float svg {
+  width: 28px;
+  height: 28px;
+}
+
+@media (hover: hover) {
+  .wa-float:hover {
+    background: var(--color-gold-light);
+  }
+}
+
+/* ---------- 19b. Age check (first visit) ---------- */
+.age-gate {
+  width: min(100% - 2rem, 26rem);
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  outline: 1px solid var(--color-border);
+  outline-offset: -8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+/* Literal colour: some browsers don't pass CSS variables into ::backdrop */
+.age-gate::backdrop {
+  background: rgba(6, 5, 4, 0.9);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.age-gate__inner {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-md);
+  padding: var(--space-2xl) var(--space-lg);
+  text-align: center;
+}
+
+.age-gate .icon {
+  width: 3rem;
+  height: 3rem;
+}
+
+.age-gate__brand {
+  color: var(--color-gold);
+}
+
+.age-gate__title {
+  font-size: 2rem;
+}
+
+.age-gate__text {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.age-gate__actions {
+  display: grid;
+  gap: var(--space-sm);
+  width: 100%;
+  margin-top: var(--space-sm);
+}
+
+.age-gate__denied {
+  margin-top: var(--space-sm);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+}
+
+.age-gate__denied:focus {
+  outline: none;
+}
+
+/* ---------- 20. Scroll reveal ---------- */
+/* Content is readable before it animates: items below the fold rest at a
+   slight offset and half opacity, then settle in as they scroll into view.
+   Items already on screen when the page loads are shown straight away. */
+@media (prefers-reduced-motion: no-preference) {
+  .has-reveal .reveal {
+    transition:
+      opacity var(--dur-reveal) var(--ease) calc(var(--reveal-i, 0) * 80ms),
+      transform var(--dur-reveal) var(--ease) calc(var(--reveal-i, 0) * 80ms),
+      border-color var(--dur) var(--ease);
+  }
+
+  .has-reveal .reveal:not(.is-visible) {
+    opacity: 0.5;
+    transform: translateY(14px);
+  }
+}
+
+/* ---------- 21. Reduced motion: switch off all movement ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
